@@ -4,18 +4,19 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"github.com/demisto/download/repo"
+
 	"github.com/demisto/download/conf"
 	"github.com/demisto/download/domain"
+	"github.com/demisto/download/repo"
 )
 
 var (
 	confFile = flag.String("conf", "", "Path to configuration file in JSON format")
-	user = flag.String("u", "admin", "The user to create")
-	pass = flag.String("p", "", "The password to set")
+	user     = flag.String("u", "admin", "The user to create")
+	pass     = flag.String("p", "", "The password to set")
 )
 
-func stderr(format string, v... interface{}) {
+func stderr(format string, v ...interface{}) {
 	fmt.Fprintf(os.Stderr, format, v...)
 	os.Exit(1)
 }

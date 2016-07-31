@@ -1,24 +1,24 @@
 package web
 
 import (
+	"bytes"
+	"encoding/json"
 	"net/http"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/demisto/download/domain"
-	"encoding/json"
-	"bytes"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCheckQuiz(t *testing.T) {
 	f := newHandlerFixture(t)
 	defer f.Close()
-	f.r.SetToken(&domain.Token{Name:"t", Downloads: 10})
-	f.r.SetQuestion(&domain.Quiz{Name: "1", Correct:[]int{0}})
-	f.r.SetQuestion(&domain.Quiz{Name: "2", Correct:[]int{1}})
-	f.r.SetQuestion(&domain.Quiz{Name: "3", Correct:[]int{2, 3}})
-	qr := quizResponse{Token:"t", Email:"aaa@bbb.com", Questions: []domain.Quiz{
-		{Name:"1", Correct:[]int{0}}, {Name:"2", Correct:[]int{1}}, {Name:"3", Correct:[]int{2, 3}}},
+	f.r.SetToken(&domain.Token{Name: "t", Downloads: 10})
+	f.r.SetQuestion(&domain.Quiz{Name: "1", Correct: []int{0}})
+	f.r.SetQuestion(&domain.Quiz{Name: "2", Correct: []int{1}})
+	f.r.SetQuestion(&domain.Quiz{Name: "3", Correct: []int{2, 3}})
+	qr := quizResponse{Token: "t", Email: "aaa@bbb.com", Questions: []domain.Quiz{
+		{Name: "1", Correct: []int{0}}, {Name: "2", Correct: []int{1}}, {Name: "3", Correct: []int{2, 3}}},
 	}
 	b, _ := json.Marshal(qr)
 	req, err := http.NewRequest("POST", "http://demisto.com/check", bytes.NewBuffer(b))
@@ -35,7 +35,7 @@ func TestCheckQuiz(t *testing.T) {
 func TestCheckQuizBruteForce(t *testing.T) {
 	f := newHandlerFixture(t)
 	defer f.Close()
-	qr := quizResponse{Token:"none", Email:"aaa@bbb.com", Questions: []domain.Quiz{{Name:"1"}, {Name:"2"}, {Name:"3"}}}
+	qr := quizResponse{Token: "none", Email: "aaa@bbb.com", Questions: []domain.Quiz{{Name: "1"}, {Name: "2"}, {Name: "3"}}}
 	b, _ := json.Marshal(qr)
 	req, _ := http.NewRequest("POST", "http://demisto.com/check", bytes.NewBuffer(b))
 	f.sendRequest(req, false, "")
