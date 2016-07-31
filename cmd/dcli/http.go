@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -41,7 +42,7 @@ type Client struct {
 // New client that does not do anything yet before the login
 func New(username, password, server string, insecure bool) (*Client, error) {
 	if username == "" || password == "" || server == "" {
-		return nil, fmt.Errorf("Please provide all the parameters")
+		return nil, errors.New("Please provide all the parameters")
 	}
 	if !strings.HasSuffix(server, "/") {
 		server += "/"
@@ -181,4 +182,19 @@ func (c *Client) Upload(name, filePath string) error {
 	writer.Close()
 	err = c.req("POST", "upload", writer.FormDataContentType(), b, nil)
 	return err
+}
+
+type newTokens struct {
+	Count     int `json:"count"`
+	Downloads int `json:"downloads"`
+}
+
+func (c *Client) Generate(count, downloads int) (tokens []domain.Token, err error) {
+	nt := &newTokens{Count: count, Downloads: downloads}
+	b, err := json.Marshal(nt)
+	if err != nil {
+		return nil, err
+	}
+	err = c.req("POST", "tokens/generate", "", bytes.NewBuffer(b), &tokens)
+	return
 }

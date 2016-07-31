@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/demisto/download/domain"
+	"strconv"
 )
 
 var (
@@ -80,5 +81,19 @@ func main() {
 		}
 		err := c.Upload(args[1], args[2])
 		check(err)
+	case "gen":
+		if len(args) < 3 {
+			stderr("To generate tokens, please provide count and downloads\n")
+		}
+		count, err := strconv.Atoi(args[1])
+		check(err)
+		downloads, err := strconv.Atoi(args[2])
+		check(err)
+		tokens, err := c.Generate(count, downloads)
+		check(err)
+		fmt.Println("Token\t\tDownloads")
+		for _, t := range tokens {
+			fmt.Printf("%s\t\t%d\n", t.Name, t.Downloads)
+		}
 	}
 }
