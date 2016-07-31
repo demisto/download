@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <title>Demisto Download Server</title>
     <meta charset="utf-8">
     <meta name="description" content="demisto">
@@ -13,15 +13,36 @@
     <meta name="twitter:description" content="demisto">
     <meta name="twitter:creator" content="@demistoinc">
     <meta name="twitter:image:src" content="">
-    <meta property="og:title" content="demisto" />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="" />
-    <meta property="og:image" content="" />
+    <meta property="og:title" content="demisto"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:url" content=""/>
+    <meta property="og:image" content=""/>
     <meta property="og:description" content="demisto">
-
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  </head>
-  <body>
-    <div id="app"></div>
-  </body>
+    <link rel="stylesheet" href="https://raw.githubusercontent.com/Semantic-Org/Semantic-UI-CSS/master/semantic.min.css" />
+
+</head>
+<body>
+    <form name="quiz" id="quiz">
+        <label for="token">Code:</label><input id="token" name="token"/>
+        <label for="email">Email:</label><input type="email" id="email" name="email"/>
+    </form>
+    <script src="https://raw.githubusercontent.com/Semantic-Org/Semantic-UI-CSS/master/semantic.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+    <script type="text/javascript">
+          $(document).ready(function() {
+            $.ajax('/quiz', {
+              dataType: 'json',
+              data: {count: 3},
+              success: function(data) {
+                var form = $('#quiz');
+                $.each(data, function(i, v) {
+                  form.append('<p>' + v.question + '</p>');
+                });
+              }
+            });
+          });
+
+    </script>
+</body>
 </html>

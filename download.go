@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	confFile = flag.String("conf", "conf.json", "Path to configuration file in JSON format")
+	confFile = flag.String("conf", "", "Path to configuration file in JSON format")
 	logLevel = flag.String("loglevel", "info", "Specify the log level for output (debug/info/warn/error/fatal/panic) - default is info")
 	logFile  = flag.String("logfile", "", "The log file location")
 )
@@ -66,9 +66,12 @@ func run(signalCh chan os.Signal) {
 
 func main() {
 	flag.Parse()
-	err := conf.Load(*confFile)
-	if err != nil {
-		logrus.Fatal(err)
+	conf.Default()
+	if *confFile != "" {
+		err := conf.Load(*confFile)
+		if err != nil {
+			logrus.Fatal(err)
+		}
 	}
 	level, err := logrus.ParseLevel(*logLevel)
 	if err != nil {
