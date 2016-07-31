@@ -65,6 +65,8 @@ type Repo struct {
 //   mysql> GRANT ALL on download.* TO download;
 //   mysql> drop user ''@'localhost';
 // The last command drops the anonymous user
+// Repo basically ignores optimistic locking and will have lost update problem but since this is considered
+// low volume and not a big deal if we allow additional download - decided to just ignore
 func New() (*Repo, error) {
 	logrus.Infof("Using MySQL at %s with user %s", conf.Options.DB.ConnectString, conf.Options.DB.Username)
 	// If we specified TLS connection, we need the certificate files

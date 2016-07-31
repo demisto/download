@@ -38,6 +38,11 @@ func (ac *AppContext) downloadHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Disposition", "attachment; filename="+name)
 	fileServer := http.FileServer(http.Dir(dir))
 	fileServer.ServeHTTP(w, r)
+	token.Downloads--
+	err = ac.r.SetToken(token)
+	if err != nil {
+		log.WithError(err).Errorf("Could not update token in the database - %#v", token)
+	}
 }
 
 // uploadHandler allows an admin to upload a new file
