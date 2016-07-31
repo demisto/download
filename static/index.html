@@ -45,7 +45,6 @@
       data: {count: 3},
       success: function (data, status, xhr) {
         var xsrfToken = document.cookie.substr('XSRF-TOKEN='.length);
-        console.log(xsrfToken);
         document.getElementById('submit').onclick = function () {
           var token = document.getElementById('token').value;
           var email = document.getElementById('email').value;
@@ -63,7 +62,6 @@
             questions.push(question);
           });
           var quizResponse = {token: token, email: email, questions: questions};
-          console.log(xsrfToken);
           $.ajax({
             url: '/check',
             headers: {
