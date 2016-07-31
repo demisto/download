@@ -1,3 +1,25 @@
+# Compiled Object files, Static and Dynamic libs (Shared Objects)
+*.o
+*.a
+*.so
+*.exe
+*.test
+*.prof
+*.syso
+.DS_Store
+
+download
+.idea
+tags
+*.iml
+
+build/
+dist/
+bin/
+node_modules/
+bower_components/
+vendor/
+
 # Logs
 logs
 *.log
@@ -35,3 +57,5 @@ jspm_packages
 
 # Optional REPL history
 .node_repl_history
+
+webpack-assets.json
