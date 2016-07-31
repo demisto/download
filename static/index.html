@@ -19,30 +19,77 @@
     <meta property="og:image" content=""/>
     <meta property="og:description" content="demisto">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link rel="stylesheet" href="https://raw.githubusercontent.com/Semantic-Org/Semantic-UI-CSS/master/semantic.min.css" />
-
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.2/semantic.min.css" crossorigin="anonymous">
 </head>
 <body>
-    <form name="quiz" id="quiz">
-        <label for="token">Code:</label><input id="token" name="token"/>
-        <label for="email">Email:</label><input type="email" id="email" name="email"/>
-    </form>
-    <script src="https://raw.githubusercontent.com/Semantic-Org/Semantic-UI-CSS/master/semantic.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
-    <script type="text/javascript">
-          $(document).ready(function() {
-            $.ajax('/quiz', {
-              dataType: 'json',
-              data: {count: 3},
-              success: function(data) {
-                var form = $('#quiz');
-                $.each(data, function(i, v) {
-                  form.append('<p>' + v.question + '</p>');
-                });
+<div class="ui grid content">
+    <div class="sixteen wide column quiz-form">
+        <div name="quiz" id="quiz" class="sixteen wide column ui form">
+            <div class="inline field" for="token">
+                <div>Code:</div>
+                <input id="token" name="token"/></div>
+            <div class="inline field" for="email">
+                <div>Email:</div>
+                <input type="email" id="email" name="email"/></div>
+        </div>
+        <button class="ui primary button submit-button" id="submit" type="button">Submit</button>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/semantic-ui/2.2.2/semantic.min.js" crossorigin="anonymous"></script>
+<script type="text/javascript">
+  $(document).ready(function () {
+    $.ajax('/quiz', {
+      dataType: 'json',
+      data: {count: 3},
+      success: function (data, status, xhr) {
+        var xsrfToken = document.cookie.substr('XSRF-TOKEN='.length);
+        console.log(xsrfToken);
+        document.getElementById('submit').onclick = function () {
+          var token = document.getElementById('token').value;
+          var email = document.getElementById('email').value;
+          var questions = [];
+          $.each(data, function (i, v) {
+            var question = {name: v.name, question: v.question};
+            var answers = [];
+            $.each(v.answers, function (j, a) {
+              var name = i + "_" + j;
+              if (document.getElementById(name).checked) {
+                answers.push(a);
               }
             });
+            question['answers'] = answers;
+            questions.push(question);
           });
-
-    </script>
+          var quizResponse = {token: token, email: email, questions: questions};
+          console.log(xsrfToken);
+          $.ajax({
+            url: '/check',
+            headers: {
+              'X-XSRF-TOKEN': xsrfToken,
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            method: 'POST',
+            dataType: 'json',
+            data: JSON.stringify(quizResponse),
+            success: function (data) {
+              console.log('succes: ' + data);
+            }
+          });
+        };
+        var form = $('#quiz');
+        $.each(data, function (i, v) {
+          form.append('<div class="field">' + v.question + '</div>');
+          $.each(v.answers, function (j, a) {
+            var name = i + "_" + j;
+            form.append('<div class="inline field"><input type="checkbox" id=' + name + '><label>' + a + '</label></div>');
+          });
+        });
+      }
+    });
+  });
+</script>
 </body>
 </html>

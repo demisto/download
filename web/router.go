@@ -140,6 +140,7 @@ func (r *Router) registerStaticHandlers() {
 	// Static
 	r.Get("/", nil, r.staticHandlers.ThenFunc(pageHandler("index.html")))
 	r.Get("/favicon.ico", nil, r.staticHandlers.ThenFunc(pageHandler("favicon.ico")))
+	r.Get("/style.css", nil, r.staticHandlers.ThenFunc(pageHandler("style.css")))
 	r.ServeGzipFiles("/assets/*filepath", http.Dir(public+"assets"))
 }
 

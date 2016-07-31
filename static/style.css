@@ -1,0 +1,17 @@
+.ui.primary.button {
+  background-color: #f2ae31 !important;
+  color: #000 !important;
+}
+
+.content {
+  background-color: #fcfcfc;
+}
+
+.submit-button {
+  margin-top: 10px !important;
+}
+
+.quiz-form {
+  margin: 12px !important;
+  color: #618081;
+}
