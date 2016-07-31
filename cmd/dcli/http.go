@@ -198,3 +198,8 @@ func (c *Client) Generate(count, downloads int) (tokens []domain.Token, err erro
 	err = c.req("POST", "tokens/generate", "", bytes.NewBuffer(b), &tokens)
 	return
 }
+
+func (c *Client) Questions() (questions []domain.Quiz, err error) {
+	err = c.req("GET", "quizall", "", nil, &questions)
+	return
+}

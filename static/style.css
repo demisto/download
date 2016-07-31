@@ -1,17 +1,28 @@
-.ui.primary.button {
-  background-color: #f2ae31 !important;
-  color: #000 !important;
+body {
+  background-color: #DADADA;
 }
 
-.content {
-  background-color: #fcfcfc;
+body > .grid {
+  height: 100%;
 }
 
-.submit-button {
-  margin-top: 10px !important;
+.image {
+  margin-top: -100px !important;
 }
 
-.quiz-form {
-  margin: 12px !important;
-  color: #618081;
+.column {
+  max-width: 450px;
+}
+
+.demisto-green {
+  color: #618081 !important;
+}
+
+.submit {
+  background-color: #618081 !important;
+}
+
+.header .image {
+  background-color: #618081 !important;
+  width: 100% !important;
 }

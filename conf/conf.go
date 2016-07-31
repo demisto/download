@@ -82,7 +82,7 @@ func Default() {
 	Options.Address = ":9090"
 	Options.Security.SessionKey = "kukuKiki1234qawsed.Strazaaplokij"
 	Options.Security.DBKey = Options.Security.SessionKey
-	Options.Security.Timeout = 60
+	Options.Security.Timeout = 1440
 	Options.DB.Username = "download"
 	Options.DB.Password = "demisto1999"
 	Options.DB.ConnectString = "tcp/download?parseTime=true"

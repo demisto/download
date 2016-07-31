@@ -33,7 +33,8 @@ func (ac *AppContext) downloadHandler(w http.ResponseWriter, r *http.Request) {
 		WriteError(w, ErrInternalServer)
 		return
 	}
-	name, dir := filepath.Split(absFile)
+	dir, name := filepath.Split(absFile)
+	log.Infof("Downloading file %s from %s", name, dir)
 	r.URL.Path = name
 	w.Header().Set("Content-Disposition", "attachment; filename="+name)
 	fileServer := http.FileServer(http.Dir(dir))
@@ -67,9 +68,10 @@ func (ac *AppContext) uploadHandler(w http.ResponseWriter, r *http.Request) {
 		WriteError(w, ErrBadRequest)
 		return
 	}
-	out, err := os.Create(filepath.Join(conf.Options.Dir, finalFileName))
+	finalPath := filepath.Join(conf.Options.Dir, finalFileName)
+	out, err := os.Create(finalPath)
 	if err != nil {
-		log.WithError(err).Error("Failed saving upload file")
+		log.WithError(err).Error("Failed saving upload file - %s", finalPath)
 		WriteError(w, ErrInternalServer)
 		return
 	}
@@ -80,7 +82,7 @@ func (ac *AppContext) uploadHandler(w http.ResponseWriter, r *http.Request) {
 		WriteError(w, ErrInternalServer)
 		return
 	}
-	err = ac.r.SetDownload(&domain.Download{Name: downloadName, Path: finalFileName})
+	err = ac.r.SetDownload(&domain.Download{Name: downloadName, Path: finalPath})
 	if err != nil {
 		log.WithError(err).Error("Error saving download to DB")
 		WriteError(w, ErrInternalServer)

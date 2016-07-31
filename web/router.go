@@ -141,6 +141,7 @@ func (r *Router) registerStaticHandlers() {
 	r.Get("/", nil, r.staticHandlers.ThenFunc(pageHandler("index.html")))
 	r.Get("/favicon.ico", nil, r.staticHandlers.ThenFunc(pageHandler("favicon.ico")))
 	r.Get("/style.css", nil, r.staticHandlers.ThenFunc(pageHandler("style.css")))
+	r.Get("/404", nil, r.staticHandlers.ThenFunc(pageHandler("404.html")))
 	r.ServeGzipFiles("/assets/*filepath", http.Dir(public+"assets"))
 }
 
@@ -153,6 +154,7 @@ func (r *Router) registerApplicationHandlers() {
 	r.Post("/user", []domain.UserType{domain.UserTypeAdmin}, r.authHandlers.Append(jsonContentTypeHandler, bodyHandler(userDetails{})).ThenFunc(r.appContext.handleUserUpdate))
 	// Quiz
 	r.Get("/quiz", nil, r.commonHandlers.ThenFunc(r.appContext.quizHandler))
+	r.Get("/quizall", []domain.UserType{domain.UserTypeAdmin}, r.commonHandlers.ThenFunc(r.appContext.quizAllHandler))
 	r.Post("/quiz", []domain.UserType{domain.UserTypeAdmin}, r.authHandlers.Append(jsonContentTypeHandler, bodyHandler(domain.Quiz{})).ThenFunc(r.appContext.updateQuizHandler))
 	r.Post("/check", nil, r.commonHandlers.Append(jsonContentTypeHandler, bodyHandler(quizResponse{})).ThenFunc(r.appContext.checkQuiz))
 	// Token
@@ -230,7 +232,7 @@ func (r *Router) Serve() {
 
 // 404 not found handler
 func notFoundHandler(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, "/#/404", http.StatusSeeOther)
+	http.Redirect(w, r, "/404", http.StatusSeeOther)
 }
 
 // GetTLSConfig ...

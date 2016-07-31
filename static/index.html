@@ -19,73 +19,160 @@
     <meta property="og:image" content=""/>
     <meta property="og:description" content="demisto">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link rel="stylesheet" type="text/css" href="style.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.2/semantic.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="/style.css">
 </head>
 <body>
-<div class="ui grid content">
-    <div class="sixteen wide column quiz-form">
-        <div name="quiz" id="quiz" class="sixteen wide column ui form">
-            <div class="inline field" for="token">
-                <div>Code:</div>
-                <input id="token" name="token"/></div>
-            <div class="inline field" for="email">
-                <div>Email:</div>
-                <input type="email" id="email" name="email"/></div>
-        </div>
-        <button class="ui primary button submit-button" id="submit" type="button">Submit</button>
+<div class="ui middle aligned center aligned grid">
+    <div class="column">
+        <h2 class="ui demisto-green image header">
+            <img src="/assets/logo.png" class="image"/>
+            <div class="content">Please provide your details and meet the challenge</div>
+        </h2>
+        <form id="quiz" class="ui large form">
+            <div class="ui stacked segment">
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="user icon"></i>
+                        <input type="text" id="email" name="email" placeholder="E-mail address">
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="lock icon"></i>
+                        <input type="text" id="token" name="token" placeholder="Code to unlock download">
+                    </div>
+                </div>
+                <div class="ui fluid large teal submit button" id="submit">Submit</div>
+            </div>
+            <div class="ui error message"></div>
+        </form>
+    </div>
+</div>
+<div id="errorAnswers" class="ui small modal">
+    <div class="header">Wrong answers!</div>
+    <div class="content">
+        <p>Hmmm... looks like someone needs a bit more practicing</p>
+    </div>
+    <div class="actions">
+        <div class="ui approve button">OK</div>
+    </div>
+</div>
+<div id="errorModal" class="ui small modal">
+    <div class="header">Error</div>
+    <div class="content">
+        <p>Some error occurred</p>
+    </div>
+    <div class="actions">
+        <div class="ui approve button">OK</div>
     </div>
 </div>
 <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/semantic-ui/2.2.2/semantic.min.js" crossorigin="anonymous"></script>
 <script type="text/javascript">
-  $(document).ready(function () {
+  function addQuestions() {
+    // First, remove all the questions from the form
+    $('.question').remove();
+    $('.answer').remove();
     $.ajax('/quiz', {
       dataType: 'json',
       data: {count: 3},
       success: function (data, status, xhr) {
-        var xsrfToken = document.cookie.substr('XSRF-TOKEN='.length);
-        document.getElementById('submit').onclick = function () {
-          var token = document.getElementById('token').value;
-          var email = document.getElementById('email').value;
-          var questions = [];
-          $.each(data, function (i, v) {
-            var question = {name: v.name, question: v.question};
-            var answers = [];
-            $.each(v.answers, function (j, a) {
-              var name = i + "_" + j;
-              if (document.getElementById(name).checked) {
-                answers.push(a);
-              }
-            });
-            question['answers'] = answers;
-            questions.push(question);
-          });
-          var quizResponse = {token: token, email: email, questions: questions};
-          $.ajax({
-            url: '/check',
-            headers: {
-              'X-XSRF-TOKEN': xsrfToken,
-              'Content-Type': 'application/json',
-              'Accept': 'application/json'
-            },
-            method: 'POST',
-            dataType: 'json',
-            data: JSON.stringify(quizResponse),
-            success: function (data) {
-              console.log('succes: ' + data);
-            }
-          });
-        };
-        var form = $('#quiz');
+        var submit = $('#quiz .submit');
         $.each(data, function (i, v) {
-          form.append('<div class="field">' + v.question + '</div>');
+          submit.before('<div class="field question" id=' + v.name + '><div class="ui left input">' + v.question + '</div></div>');
           $.each(v.answers, function (j, a) {
-            var name = i + "_" + j;
-            form.append('<div class="inline field"><input type="checkbox" id=' + name + '><label>' + a + '</label></div>');
+            var name = v.name + "_" + j;
+            submit.before('<div class="field answer"><div class="ui checkbox"><input type="checkbox" id=' + name + '><label>' + a + '</label></div></div>');
           });
         });
       }
+    });
+  }
+  function handleError(status) {
+    $('#errorModal .header').text(status.title);
+    $('#errorModal .content p').text(status.detail);
+    $('#errorModal').modal('show');
+  }
+
+  $(document).ready(function () {
+    addQuestions();
+    $('.ui.form').form({
+      fields: {
+        email: {
+          identifier  : 'email',
+          rules: [
+            {
+              type   : 'empty',
+              prompt : 'Please enter your e-mail'
+            },
+            {
+              type   : 'email',
+              prompt : 'Please enter a valid e-mail'
+            }
+          ]
+        },
+        token: {
+          identifier  : 'token',
+          rules: [
+            {
+              type   : 'empty',
+              prompt : 'Please enter the code to unlock the download'
+            }
+          ]
+        }
+      }
+    });
+    $('#quiz').submit(function(e) {
+      e.preventDefault();
+      if (!$(this).form('is valid')) {
+        return;
+      }
+      var xsrfToken = decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent('XSRF-TOKEN').replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
+      var token = document.getElementById('token').value;
+      var email = document.getElementById('email').value;
+      var questions = {};
+      $('input:checkbox').each(function() {
+        var parts = this.id.split('_');
+        if (!questions[parts[0]]) {
+          questions[parts[0]] = {name: parts[0], correct: []};
+        }
+        if (this.checked) {
+          questions[parts[0]].correct.push(parseInt(parts[1]));
+        }
+      });
+      questionsList = [];
+      Object.keys(questions).forEach(function(v) {
+        questionsList.push(questions[v]);
+      });
+      var quizResponse = {token: token, email: email, questions: questionsList};
+      $.ajax({
+        url: '/check',
+        headers: {
+          'X-XSRF-TOKEN': xsrfToken,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        method: 'POST',
+        dataType: 'json',
+        data: JSON.stringify(quizResponse),
+        success: function (data) {
+          if (data.result) {
+            window.location.href = 'http://go.demisto.com/community-edition-download?' + $.param({code: token, email: email});
+          } else {
+            addQuestions();
+            $('#errorAnswers').modal('show');
+          }
+        },
+        statusCode: {
+          400: function(xhr) {
+            handleError(xhr.responseJSON);
+          },
+          500: function(xhr) {
+            handleError(xhr.responseJSON);
+          }
+        }
+      });
     });
   });
 </script>

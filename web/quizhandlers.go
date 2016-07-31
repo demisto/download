@@ -43,6 +43,17 @@ func (ac *AppContext) quizHandler(w http.ResponseWriter, r *http.Request) {
 	writeWithFilter(w, selected, domain.QuizFilterFields...)
 }
 
+// quizAllHandler returns all the questions
+func (ac *AppContext) quizAllHandler(w http.ResponseWriter, r *http.Request) {
+	q, err := ac.r.Questions()
+	if err != nil {
+		log.WithError(err).Warn("Unable to serve questions")
+		WriteError(w, ErrInternalServer)
+		return
+	}
+	writeJSON(w, q)
+}
+
 // updateQuizHandler updates the quizes
 func (ac *AppContext) updateQuizHandler(w http.ResponseWriter, r *http.Request) {
 	q := context.Get(r, "body").(*domain.Quiz)
@@ -77,7 +88,7 @@ func (ac *AppContext) checkQuiz(w http.ResponseWriter, r *http.Request) {
 	if err == repo.ErrNotFound {
 		// Make sure no one is brute forcing us
 		ac.preventBruteForce(r.RemoteAddr)
-		WriteError(w, ErrBadRequest)
+		WriteError(w, &Error{ID: "bad_request", Status: 400, Title: "Invalid Token", Detail: "Provided token is not valid"})
 		return
 	}
 	if err != nil {
