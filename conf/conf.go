@@ -84,7 +84,7 @@ func Default() {
 	Options.Security.DBKey = Options.Security.SessionKey
 	Options.Security.Timeout = 60
 	Options.DB.Username = "download"
-	Options.DB.Password = "password"
+	Options.DB.Password = "demisto1999"
 	Options.DB.ConnectString = "tcp/download?parseTime=true"
 	Options.Dir = "."
 }
