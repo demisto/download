@@ -6,8 +6,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"mime/multipart"
 	"net/http"
 	"net/http/cookiejar"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/demisto/download/domain"
@@ -148,4 +151,34 @@ func (c *Client) SetUser(u *userDetails) (*domain.User, error) {
 	res := &domain.User{}
 	err = c.req("POST", "user", "", bytes.NewBuffer(b), res)
 	return res, err
+}
+
+// Upload adds a version to the download server
+func (c *Client) Upload(name, filePath string) error {
+	b := &bytes.Buffer{}
+	writer := multipart.NewWriter(b)
+	part, err := writer.CreateFormFile("file", filepath.Base(filePath))
+	if err != nil {
+		return err
+	}
+	f, err := os.Open(filePath)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	_, err = io.Copy(part, f)
+	if err != nil {
+		return err
+	}
+	namePart, err := writer.CreateFormField("name")
+	if err != nil {
+		return err
+	}
+	_, err = namePart.Write([]byte(name))
+	if err != nil {
+		return err
+	}
+	writer.Close()
+	err = c.req("POST", "upload", writer.FormDataContentType(), b, nil)
+	return err
 }

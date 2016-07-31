@@ -1,11 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
 
-	"encoding/json"
 	"github.com/demisto/download/domain"
 )
 
@@ -74,5 +74,11 @@ func main() {
 		check(err)
 		b, _ := json.MarshalIndent(res, "", "  ")
 		fmt.Printf("Created user:\n%s\n", string(b))
+	case "upload":
+		if len(args) < 3 {
+			stderr("Upload should receive 2 parameters - name and path\n")
+		}
+		err := c.Upload(args[1], args[2])
+		check(err)
 	}
 }
