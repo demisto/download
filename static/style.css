@@ -27,6 +27,10 @@ body > .grid {
   color: #181818 !important;
 }
 
+.submit:hover {
+  background-color: #ffb622 !important;
+}
+
 .header .image {
   background-color: #618081 !important;
   width: 100% !important;
