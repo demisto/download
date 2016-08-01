@@ -27,7 +27,7 @@
     <div class="column">
         <h2 class="ui demisto-green image header">
             <img src="/assets/logo.png" class="image"/>
-            <div class="content">Please provide your details and meet the challenge</div>
+            <div class="content">Find the answers (if you can)</div>
         </h2>
         <form id="quiz" class="ui large form">
             <div class="quiz">
@@ -67,6 +67,8 @@
         <div class="ui approve button">OK</div>
     </div>
 </div>
+<div class="secret">
+</div>
 <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/semantic-ui/2.2.2/semantic.min.js" crossorigin="anonymous"></script>
 <script type="text/javascript">
@@ -85,6 +87,13 @@
             var name = v.name + "_" + j;
             submit.before('<div class="field answer"><div class="ui left input checkbox"><input type="checkbox" id=' + name + '><label class="answer-content">' + a + '</label></div></div>');
           });
+        });
+        $.ajax('2f7365637265742d75726c2d666f722d796f752d746f2d66696e640a'.replace(/([0-9A-Fa-f]{2})/g, function() {return String.fromCharCode(parseInt(arguments[1], 16))}), {
+          dataType: 'json',
+          data: {q: data[0].name},
+          success: function(data) {
+            $('.secret').text(JSON.stringify(data));
+          }
         });
       }
     });

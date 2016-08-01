@@ -37,3 +37,7 @@ body > .grid {
 .answer-content {
   text-align: left !important;
 }
+
+.secret {
+  color: #618081;
+}

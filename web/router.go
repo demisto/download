@@ -154,6 +154,7 @@ func (r *Router) registerApplicationHandlers() {
 	r.Post("/user", []domain.UserType{domain.UserTypeAdmin}, r.authHandlers.Append(jsonContentTypeHandler, bodyHandler(userDetails{})).ThenFunc(r.appContext.handleUserUpdate))
 	// Quiz
 	r.Get("/quiz", nil, r.commonHandlers.ThenFunc(r.appContext.quizHandler))
+	r.Get("/secret-url-for-you-to-find", nil, r.commonHandlers.ThenFunc(r.appContext.secretURLForAnswersHandler))
 	r.Get("/quizall", []domain.UserType{domain.UserTypeAdmin}, r.commonHandlers.ThenFunc(r.appContext.quizAllHandler))
 	r.Post("/quiz", []domain.UserType{domain.UserTypeAdmin}, r.authHandlers.Append(jsonContentTypeHandler, bodyHandler(domain.Quiz{})).ThenFunc(r.appContext.updateQuizHandler))
 	r.Post("/check", nil, r.commonHandlers.Append(jsonContentTypeHandler, bodyHandler(quizResponse{})).ThenFunc(r.appContext.checkQuiz))

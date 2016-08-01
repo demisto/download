@@ -154,3 +154,25 @@ func (ac *AppContext) checkQuiz(w http.ResponseWriter, r *http.Request) {
 
 	writeJSON(w, map[string]bool{"result": true})
 }
+
+// secretURLForAnswersHandler for someone looking hard enough - we want to give the answers
+func (ac *AppContext) secretURLForAnswersHandler(w http.ResponseWriter, r *http.Request) {
+	question := r.FormValue("q")
+	if question == "" {
+		WriteError(w, ErrBadRequest)
+		return
+	}
+	questions, err := ac.r.Questions()
+	if err != nil {
+		log.WithError(err).Warn("Unable to load questions")
+		WriteError(w, ErrInternalServer)
+		return
+	}
+	for _, q := range questions {
+		if q.Name == question {
+			writeJSON(w, q.Correct)
+			return
+		}
+	}
+	writeJSON(w, []int{})
+}
