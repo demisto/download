@@ -30,7 +30,7 @@
             <div class="content">Please provide your details and meet the challenge</div>
         </h2>
         <form id="quiz" class="ui large form">
-            <div class="ui stacked segment">
+            <div class="quiz">
                 <div class="field">
                     <div class="ui left icon input">
                         <i class="user icon"></i>
@@ -83,7 +83,7 @@
           submit.before('<div class="field question" id=' + v.name + '><div class="ui left input">' + v.question + '</div></div>');
           $.each(v.answers, function (j, a) {
             var name = v.name + "_" + j;
-            submit.before('<div class="field answer"><div class="ui checkbox"><input type="checkbox" id=' + name + '><label>' + a + '</label></div></div>');
+            submit.before('<div class="field answer"><div class="ui left input checkbox"><input type="checkbox" id=' + name + '><label class="answer-content">' + a + '</label></div></div>');
           });
         });
       }
