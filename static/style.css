@@ -6,6 +6,10 @@ body > .grid {
   height: 100%;
 }
 
+.main-form {
+  margin-top: 160px !important;
+}
+
 .image {
   margin-top: -100px !important;
 }
@@ -21,6 +25,10 @@ body > .grid {
 .submit {
   background-color: #f2ae31 !important;
   color: #181818 !important;
+}
+
+.submit:hover {
+  background-color: #ffb622 !important;
 }
 
 .header .image {
