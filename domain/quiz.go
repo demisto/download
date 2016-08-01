@@ -16,7 +16,7 @@ type Quiz struct {
 }
 
 // QuizFilterFields is the list of fields we should filter when sending to clients
-var QuizFilterFields = []string{"right"}
+var QuizFilterFields = []string{"correct"}
 
 const qseq = "*|*"
 
