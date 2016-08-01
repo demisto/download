@@ -50,6 +50,8 @@ var Options struct {
 	}
 	// Dir where to place the files
 	Dir string
+	// Location of the static resources
+	Static string
 }
 
 // The pipe writer to wrap around standard logger. It is configured in main.
@@ -87,4 +89,5 @@ func Default() {
 	Options.DB.Password = "password"
 	Options.DB.ConnectString = "tcp/download?parseTime=true"
 	Options.Dir = "."
+	Options.Static = "static"
 }

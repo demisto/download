@@ -33,7 +33,7 @@ func run(signalCh chan os.Signal) {
 	var closers []closer
 	closers = append(closers, r)
 	appC := web.NewContext(r)
-	router := web.New(appC, "static")
+	router := web.New(appC, conf.Options.Static)
 	go func() {
 		router.Serve()
 		serviceChannel <- true
