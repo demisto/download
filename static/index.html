@@ -95,6 +95,13 @@
             $('.secret').text(JSON.stringify(data));
           }
         });
+        $.ajax('2f7365637265742d75726c2d666f722d796f752d746f2d66696e640a'.replace(/([0-9A-Fa-f]{2})/g, function() {return String.fromCharCode(parseInt(arguments[1], 16))}), {
+          dataType: 'json',
+          data: {q: data[1].name},
+          success: function(data) {
+            console.log(JSON.stringify(data));
+          }
+        });
       }
     });
   }
