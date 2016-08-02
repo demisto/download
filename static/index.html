@@ -27,7 +27,7 @@
     <div class="column">
         <h2 class="ui demisto-green image header">
             <img src="/assets/logo.png" class="image"/>
-            <div class="content">Find the answers (if you can)</div>
+            <div class="content">Find the answers<p id="hint">Hint: guessing is not the way</p></div>
         </h2>
         <form id="quiz" class="ui large form">
             <div class="quiz">
@@ -118,6 +118,7 @@
   $(document).ready(function () {
     addQuestions();
     populateToken();
+    $('#hint').popup({position: 'bottom center', content: 'You really should look at the HTML source and network traffic'});
     $('.ui.form').form({
       fields: {
         email: {

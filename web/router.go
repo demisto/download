@@ -142,6 +142,7 @@ func (r *Router) registerStaticHandlers() {
 	r.Get("/favicon.ico", nil, r.staticHandlers.ThenFunc(pageHandler("favicon.ico")))
 	r.Get("/style.css", nil, r.staticHandlers.ThenFunc(pageHandler("style.css")))
 	r.Get("/404", nil, r.staticHandlers.ThenFunc(pageHandler("404.html")))
+	r.Get("/demisto-free-edition", nil, r.staticHandlers.ThenFunc(pageHandler("download.html")))
 	r.ServeGzipFiles("/assets/*filepath", http.Dir(public+"assets"))
 }
 
@@ -163,7 +164,8 @@ func (r *Router) registerApplicationHandlers() {
 	r.Post("/tokens/generate", []domain.UserType{domain.UserTypeAdmin}, r.authHandlers.Append(jsonContentTypeHandler, bodyHandler(newTokens{})).ThenFunc(r.appContext.createTokensHandler))
 	r.Post("/token", []domain.UserType{domain.UserTypeAdmin}, r.authHandlers.Append(jsonContentTypeHandler, bodyHandler(domain.Token{})).ThenFunc(r.appContext.updateToken))
 	// Downloads
-	r.Get("/demisto-free-edition", []domain.UserType{domain.UserTypeUser, domain.UserTypeAdmin}, r.fileHandlers.ThenFunc(r.appContext.downloadHandler))
+	r.Get("/check-download", []domain.UserType{domain.UserTypeUser, domain.UserTypeAdmin}, r.authHandlers.ThenFunc(r.appContext.checkDownloadHandler))
+	r.Get("/download", []domain.UserType{domain.UserTypeUser, domain.UserTypeAdmin}, r.fileHandlers.ThenFunc(r.appContext.downloadHandler))
 	r.Post("/upload", []domain.UserType{domain.UserTypeAdmin}, r.authHandlers.Append(multipartContentTypeHandler).ThenFunc(r.appContext.uploadHandler))
 }
 

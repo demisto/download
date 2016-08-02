@@ -13,18 +13,41 @@ import (
 )
 
 // downloadHandler returns the install file
+func (ac *AppContext) checkDownloadHandler(w http.ResponseWriter, r *http.Request) {
+	u := context.Get(r, "user").(*domain.User)
+	if u.Type == domain.UserTypeUser {
+		token, err := ac.r.Token(u.Token)
+		if err != nil {
+			log.WithError(err).Errorf("Something is really weird - no token for %#v", u)
+			WriteError(w, ErrInternalServer)
+			return
+		}
+		// Token all used up
+		if token.Downloads < 1 {
+			WriteError(w, &Error{ID: "bad_request", Status: 400, Title: "Invalid Token", Detail: "Token is fully used and no longer allowed to download"})
+			return
+		}
+	}
+	writeJSON(w, map[string]bool{"result": true})
+}
+
+// downloadHandler returns the install file
 func (ac *AppContext) downloadHandler(w http.ResponseWriter, r *http.Request) {
 	u := context.Get(r, "user").(*domain.User)
-	token, err := ac.r.Token(u.Token)
-	if err != nil {
-		log.WithError(err).Errorf("Something is really weird - no token for %#v", u)
-		WriteError(w, ErrInternalServer)
-		return
-	}
-	// Token all used up
-	if token.Downloads < 1 {
-		WriteError(w, &Error{ID: "bad_request", Status: 400, Title: "Invalid Token", Detail: "Token is fully used and no longer allowed to download"})
-		return
+	var token *domain.Token
+	if u.Type == domain.UserTypeUser {
+		var err error
+		token, err = ac.r.Token(u.Token)
+		if err != nil {
+			log.WithError(err).Errorf("Something is really weird - no token for %#v", u)
+			WriteError(w, ErrInternalServer)
+			return
+		}
+		// Token all used up
+		if token.Downloads < 1 {
+			WriteError(w, &Error{ID: "bad_request", Status: 400, Title: "Invalid Token", Detail: "Token is fully used and no longer allowed to download"})
+			return
+		}
 	}
 	d, err := ac.r.Download("free")
 	absFile, err := filepath.Abs(d.Path)
@@ -39,10 +62,12 @@ func (ac *AppContext) downloadHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Disposition", "attachment; filename="+name)
 	fileServer := http.FileServer(http.Dir(dir))
 	fileServer.ServeHTTP(w, r)
-	token.Downloads--
-	err = ac.r.SetToken(token)
-	if err != nil {
-		log.WithError(err).Errorf("Could not update token in the database - %#v", token)
+	if token != nil {
+		token.Downloads--
+		err = ac.r.SetToken(token)
+		if err != nil {
+			log.WithError(err).Errorf("Could not update token in the database - %#v", token)
+		}
 	}
 }
 
