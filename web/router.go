@@ -143,6 +143,7 @@ func (r *Router) registerStaticHandlers() {
 	r.Get("/style.css", nil, r.staticHandlers.ThenFunc(pageHandler("style.css")))
 	r.Get("/404", nil, r.staticHandlers.ThenFunc(pageHandler("404.html")))
 	r.Get("/demisto-free-edition", nil, r.staticHandlers.ThenFunc(pageHandler("download.html")))
+	r.Get("/free-edition-install-guide", nil, r.staticHandlers.ThenFunc(pageHandler("Demisto Getting Started Guide Standalone.pdf")))
 	r.ServeGzipFiles("/assets/*filepath", http.Dir(public+"assets"))
 }
 
