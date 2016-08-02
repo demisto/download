@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Demisto Download Server</title>
+    <meta charset="utf-8">
+    <meta name="description" content="demisto">
+    <meta name="keywords" content="security,incident response,attack playback,forensics">
+
+    <!-- social media tags -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@demistoinc">
+    <meta name="twitter:title" content="demisto">
+    <meta name="twitter:description" content="demisto">
+    <meta name="twitter:creator" content="@demistoinc">
+    <meta name="twitter:image:src" content="">
+    <meta property="og:title" content="demisto"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:url" content=""/>
+    <meta property="og:image" content=""/>
+    <meta property="og:description" content="demisto">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.2/semantic.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="/style.css">
+</head>
+<body>
+<div class="ui middle aligned center aligned grid main-form content">
+    <div class="column">
+        <h2 class="ui demisto-green image header">
+            <img src="/assets/logo.png" class="image"/>
+            <div class="content">Please provide the token and email</div>
+        </h2>
+        <form id="quiz" class="ui large form">
+            <div class="quiz">
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="user icon"></i>
+                        <input type="text" id="email" name="email" placeholder="E-mail address">
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="lock icon"></i>
+                        <input type="text" id="token" name="token" placeholder="Code to unlock download">
+                    </div>
+                </div>
+                <div class="ui fluid large teal submit button" id="submit">Submit</div>
+            </div>
+            <div class="ui error message"></div>
+        </form>
+    </div>
+</div>
+<div id="errorModal" class="ui small modal">
+    <div class="header">Error</div>
+    <div class="content">
+        <p>Some error occurred</p>
+    </div>
+    <div class="actions">
+        <div class="ui approve button">OK</div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/semantic-ui/2.2.2/semantic.min.js" crossorigin="anonymous"></script>
+<script type="text/javascript">
+  function handleError(status) {
+    $('#errorModal .header').text(status.title);
+    $('#errorModal .content p').text(status.detail);
+    $('#errorModal').modal('show');
+  }
+
+  function populateToken() {
+    var url = window.location.href;
+    var regex = new RegExp("[?&]token(=([^&#]*)|&|#|$)"),
+      results = regex.exec(url);
+    if (results && results[2]) {
+      var token = decodeURIComponent(results[2].replace(/\+/g, " "));
+      document.getElementById('token').value = token;
+    }
+  }
+
+  $(document).ready(function () {
+    populateToken();
+    $('.ui.form').form({
+      fields: {
+        email: {
+          identifier  : 'email',
+          rules: [
+            {
+              type   : 'empty',
+              prompt : 'Please enter your e-mail'
+            },
+            {
+              type   : 'email',
+              prompt : 'Please enter a valid e-mail'
+            }
+          ]
+        },
+        token: {
+          identifier  : 'token',
+          rules: [
+            {
+              type   : 'empty',
+              prompt : 'Please enter the code to unlock the download'
+            }
+          ]
+        }
+      }
+    });
+    $('#quiz').submit(function(e) {
+      e.preventDefault();
+      if (!$(this).form('is valid')) {
+        return;
+      }
+      var xsrfToken = decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent('XSRF-TOKEN').replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
+      var token = document.getElementById('token').value;
+      var email = document.getElementById('email').value;
+      var quizResponse = {token: token, email: email};
+      $.ajax({
+        url: '/check-cheat',
+        headers: {
+          'X-XSRF-TOKEN': xsrfToken,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        method: 'POST',
+        dataType: 'json',
+        data: JSON.stringify(quizResponse),
+        success: function (data) {
+          window.location.href = 'http://go.demisto.com/community-edition-download?' + $.param({code: token, email: email});
+        },
+        statusCode: {
+          400: function(xhr) {
+            handleError(xhr.responseJSON);
+          },
+          500: function(xhr) {
+            handleError(xhr.responseJSON);
+          }
+        }
+      });
+    });
+  });
+</script>
+</body>
+</html>

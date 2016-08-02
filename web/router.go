@@ -139,6 +139,7 @@ func (r *Router) registerStaticHandlers() {
 
 	// Static
 	r.Get("/", nil, r.staticHandlers.ThenFunc(pageHandler("index.html")))
+	r.Get("/no-puzzle", nil, r.staticHandlers.ThenFunc(pageHandler("index-no-puzzle.html")))
 	r.Get("/favicon.ico", nil, r.staticHandlers.ThenFunc(pageHandler("favicon.ico")))
 	r.Get("/style.css", nil, r.staticHandlers.ThenFunc(pageHandler("style.css")))
 	r.Get("/404", nil, r.staticHandlers.ThenFunc(pageHandler("404.html")))
@@ -160,6 +161,7 @@ func (r *Router) registerApplicationHandlers() {
 	r.Get("/quizall", []domain.UserType{domain.UserTypeAdmin}, r.commonHandlers.ThenFunc(r.appContext.quizAllHandler))
 	r.Post("/quiz", []domain.UserType{domain.UserTypeAdmin}, r.authHandlers.Append(jsonContentTypeHandler, bodyHandler(domain.Quiz{})).ThenFunc(r.appContext.updateQuizHandler))
 	r.Post("/check", nil, r.commonHandlers.Append(jsonContentTypeHandler, bodyHandler(quizResponse{})).ThenFunc(r.appContext.checkQuiz))
+	r.Post("/check-cheat", nil, r.commonHandlers.Append(jsonContentTypeHandler, bodyHandler(quizResponse{})).ThenFunc(r.appContext.checkCheatQuiz))
 	// Token
 	r.Get("/token", []domain.UserType{domain.UserTypeAdmin}, r.authHandlers.ThenFunc(r.appContext.tokenHandler))
 	r.Post("/tokens/generate", []domain.UserType{domain.UserTypeAdmin}, r.authHandlers.Append(jsonContentTypeHandler, bodyHandler(newTokens{})).ThenFunc(r.appContext.createTokensHandler))
