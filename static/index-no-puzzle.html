@@ -125,7 +125,7 @@
         dataType: 'json',
         data: JSON.stringify(quizResponse),
         success: function (data) {
-          window.location.href = 'http://go.demisto.com/community-edition-download?' + $.param({code: token, email: email});
+          window.location.href = 'http://go.demisto.com/community-edition-download?' + $.param({download_code: token, email: email});
         },
         statusCode: {
           400: function(xhr) {
