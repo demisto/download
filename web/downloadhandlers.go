@@ -12,9 +12,8 @@ import (
 	"github.com/gorilla/context"
 )
 
-// downloadHandler returns the install file
-func (ac *AppContext) checkDownloadHandler(w http.ResponseWriter, r *http.Request) {
-	u := context.Get(r, "user").(*domain.User)
+// doCheckDownload is the common function between the cookie and parameters check
+func (ac *AppContext) doCheckDownload(u *domain.User, w http.ResponseWriter, r *http.Request) {
 	if u.Type == domain.UserTypeUser {
 		token, err := ac.r.Token(u.Token)
 		if err != nil {
@@ -31,9 +30,31 @@ func (ac *AppContext) checkDownloadHandler(w http.ResponseWriter, r *http.Reques
 	writeJSON(w, map[string]bool{"result": true})
 }
 
-// downloadHandler returns the install file
-func (ac *AppContext) downloadHandler(w http.ResponseWriter, r *http.Request) {
+// checkDownloadHandler checks if the download cookie is valid
+func (ac *AppContext) checkDownloadHandler(w http.ResponseWriter, r *http.Request) {
 	u := context.Get(r, "user").(*domain.User)
+	ac.doCheckDownload(u, w, r)
+}
+
+// checkDownloadParamsHandler checks if the download parameters are valid
+func (ac *AppContext) checkDownloadParamsHandler(w http.ResponseWriter, r *http.Request) {
+	email := r.FormValue("email")
+	token := r.FormValue("token")
+	if email == "" || token == "" {
+		WriteError(w, ErrMissingPartRequest)
+		return
+	}
+	u, err := ac.r.User(token + "*-*" + email)
+	if err != nil {
+		log.WithError(err).Errorf("Trying to load user that does not exist for download [%s %s]", token, email)
+		WriteError(w, ErrAuth)
+		return
+	}
+	ac.doCheckDownload(u, w, r)
+}
+
+// doDownload handles the actual download with either cookie or params
+func (ac *AppContext) doDownload(u *domain.User, w http.ResponseWriter, r *http.Request) {
 	var token *domain.Token
 	if u.Type == domain.UserTypeUser {
 		var err error
@@ -49,7 +70,11 @@ func (ac *AppContext) downloadHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	d, err := ac.r.Download("free")
+	downloadName := "free"
+	if r.FormValue("ova") != "" {
+		downloadName = "ova"
+	}
+	d, err := ac.r.Download(downloadName)
 	absFile, err := filepath.Abs(d.Path)
 	if err != nil {
 		log.WithError(err).Errorf("Something wrong with the file path - %#v", d)
@@ -69,6 +94,29 @@ func (ac *AppContext) downloadHandler(w http.ResponseWriter, r *http.Request) {
 			log.WithError(err).Errorf("Could not update token in the database - %#v", token)
 		}
 	}
+}
+
+// downloadHandler returns the install file
+func (ac *AppContext) downloadHandler(w http.ResponseWriter, r *http.Request) {
+	u := context.Get(r, "user").(*domain.User)
+	ac.doDownload(u, w, r)
+}
+
+// downloadParamsHandler returns the install file using parameters
+func (ac *AppContext) downloadParamsHandler(w http.ResponseWriter, r *http.Request) {
+	email := r.FormValue("email")
+	token := r.FormValue("token")
+	if email == "" || token == "" {
+		WriteError(w, ErrMissingPartRequest)
+		return
+	}
+	u, err := ac.r.User(token + "*-*" + email)
+	if err != nil {
+		log.WithError(err).Errorf("Trying to load user that does not exist for download [%s %s]", token, email)
+		WriteError(w, ErrAuth)
+		return
+	}
+	ac.doDownload(u, w, r)
 }
 
 // uploadHandler allows an admin to upload a new file

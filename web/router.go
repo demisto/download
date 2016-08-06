@@ -169,6 +169,8 @@ func (r *Router) registerApplicationHandlers() {
 	// Downloads
 	r.Get("/check-download", []domain.UserType{domain.UserTypeUser, domain.UserTypeAdmin}, r.authHandlers.ThenFunc(r.appContext.checkDownloadHandler))
 	r.Get("/download", []domain.UserType{domain.UserTypeUser, domain.UserTypeAdmin}, r.fileHandlers.ThenFunc(r.appContext.downloadHandler))
+	r.Get("/check-download-params", nil, r.commonHandlers.ThenFunc(r.appContext.checkDownloadParamsHandler))
+	r.Get("/download-params", nil, r.staticHandlers.ThenFunc(r.appContext.downloadParamsHandler))
 	r.Post("/upload", []domain.UserType{domain.UserTypeAdmin}, r.authHandlers.Append(multipartContentTypeHandler).ThenFunc(r.appContext.uploadHandler))
 }
 

@@ -45,6 +45,16 @@
 <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/semantic-ui/2.2.2/semantic.min.js" crossorigin="anonymous"></script>
 <script type="text/javascript">
+  function getParam(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, '\\$&');
+    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, ' '));
+  }
+
   function handleError(status) {
     $('#errorModal .header').text(status.title);
     $('#errorModal .content p').text(status.detail);
@@ -52,14 +62,33 @@
   }
 
   $(document).ready(function () {
-    var url = window.location.href;
-    var parts = url.split('/');
-    var server = parts[0] + '//' + parts[2];
+    var url = window.location.href,
+      parts = url.split('/'),
+      server = parts[0] + '//' + parts[2],
+      email = getParam('email', url),
+      token = getParam('download_code', url),
+      ova = getParam('ova', url),
+      checkUrl = '/check-download',
+      downloadUrl = '/download',
+      params = false;
+
+    if (email && token) {
+      checkUrl = '/check-download-params?' + $.param({email: email, token: token});
+      downloadUrl = '/download-params?' + $.param({email: email, token: token})
+      params = true;
+    }
+
+    if (ova) {
+      downloadUrl += ((params) ? '&' : '?') + $.param({ova: 'true'});
+    }
+
     $('.approve').click(function() {
       window.location.href = server + '/';
     });
+
+
     $.ajax({
-      url: '/check-download',
+      url: checkUrl,
       headers: {
         'Accept': 'application/json'
       },
@@ -67,7 +96,7 @@
       success: function (data) {
         if (data.result) {
           $('#message').text('Thank You!');
-          window.location.href = server + '/download';
+          window.location.href = server + downloadUrl;
         }
       },
       statusCode: {
