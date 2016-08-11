@@ -94,6 +94,11 @@ func (ac *AppContext) doDownload(u *domain.User, w http.ResponseWriter, r *http.
 			log.WithError(err).Errorf("Could not update token in the database - %#v", token)
 		}
 	}
+	// Just log the download
+	err = ac.r.LogDownload(u, d)
+	if err != nil {
+		log.WithError(err).Errorf("Could not log the download in the database - %#v [%v]", u, d)
+	}
 }
 
 // downloadHandler returns the install file

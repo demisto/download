@@ -45,6 +45,12 @@ CREATE TABLE IF NOT EXISTS downloads (
 	path VARCHAR(1024) NOT NULL,
 	modify_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	CONSTRAINT download_pk PRIMARY KEY (name)
+);
+CREATE TABLE IF NOT EXISTS download_log (
+	username VARCHAR(128) NOT NULL,
+	name VARCHAR(30) NOT NULL,
+	path VARCHAR(1024) NOT NULL,
+	modify_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 )`
 
 var (
@@ -247,5 +253,11 @@ func (r *Repo) SetDownload(d *domain.Download) error {
 	}
 	_, err := r.db.Exec(`INSERT INTO downloads (name, path, modify_date) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE path = ?, modify_date = ?`,
 		d.Name, d.Path, d.ModifyDate, d.Path, d.ModifyDate)
+	return err
+}
+
+func (r *Repo) LogDownload(u *domain.User, d *domain.Download) error {
+	_, err := r.db.Exec(`INSERT INTO download_log (username, name, path, modify_date) VALUES (?, ?, ?, ?)`,
+		u.Username, d.Name, d.Path, time.Now())
 	return err
 }
