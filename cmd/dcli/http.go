@@ -135,6 +135,11 @@ func (c *Client) Tokens() (tokens []domain.Token, err error) {
 	return
 }
 
+func (c *Client) DownloadLog() (l []domain.DownloadLog, err error) {
+	err = c.req("GET", "log", "", nil, &l)
+	return
+}
+
 type userDetails struct {
 	Username string          `json:"username"`
 	Password string          `json:"password"`

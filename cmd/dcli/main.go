@@ -100,5 +100,10 @@ func main() {
 		check(err)
 		b, _ := json.MarshalIndent(questions, "", "  ")
 		fmt.Printf("%s\n", string(b))
+	case "log":
+		l, err := c.DownloadLog()
+		check(err)
+		b, _ := json.MarshalIndent(l, "", "  ")
+		fmt.Printf("%s\n", string(b))
 	}
 }
