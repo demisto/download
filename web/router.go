@@ -166,6 +166,7 @@ func (r *Router) registerApplicationHandlers() {
 	r.Get("/token", []domain.UserType{domain.UserTypeAdmin}, r.authHandlers.ThenFunc(r.appContext.tokenHandler))
 	r.Post("/tokens/generate", []domain.UserType{domain.UserTypeAdmin}, r.authHandlers.Append(jsonContentTypeHandler, bodyHandler(newTokens{})).ThenFunc(r.appContext.createTokensHandler))
 	r.Post("/token", []domain.UserType{domain.UserTypeAdmin}, r.authHandlers.Append(jsonContentTypeHandler, bodyHandler(domain.Token{})).ThenFunc(r.appContext.updateToken))
+	r.Post("/tokens/email", []domain.UserType{domain.UserTypeAdmin}, r.authHandlers.Append(jsonContentTypeHandler, bodyHandler(newEmailToken{})).ThenFunc(r.appContext.createEmailTokenHandler))
 	// Downloads
 	r.Get("/check-download", []domain.UserType{domain.UserTypeUser, domain.UserTypeAdmin}, r.authHandlers.ThenFunc(r.appContext.checkDownloadHandler))
 	r.Get("/download", []domain.UserType{domain.UserTypeUser, domain.UserTypeAdmin}, r.fileHandlers.ThenFunc(r.appContext.downloadHandler))

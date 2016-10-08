@@ -204,6 +204,22 @@ func (c *Client) Generate(count, downloads int) (tokens []domain.Token, err erro
 	return
 }
 
+type newEmailToken struct {
+	Email     string `json:"email"`
+	Downloads int `json:"downloads"`
+}
+
+func (c *Client) GenerateForEmail(email string, downloads int) (token *domain.Token, err error) {
+	nt := &newEmailToken{Email: email, Downloads: downloads}
+	b, err := json.Marshal(nt)
+	if err != nil {
+		return nil, err
+	}
+	token = &domain.Token{}
+	err = c.req("POST", "tokens/email", "", bytes.NewBuffer(b), &token)
+	return
+}
+
 func (c *Client) Questions() (questions []domain.Quiz, err error) {
 	err = c.req("GET", "quizall", "", nil, &questions)
 	return

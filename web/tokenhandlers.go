@@ -7,6 +7,8 @@ import (
 	"github.com/demisto/download/domain"
 	"github.com/demisto/download/util"
 	"github.com/gorilla/context"
+	"github.com/asaskevich/govalidator"
+	"time"
 )
 
 // tokenHandler handles get retrieve tokens requests
@@ -56,4 +58,34 @@ func (ac *AppContext) updateToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, t)
+}
+
+type newEmailToken struct {
+	Email     string `json:"email"`
+	Downloads int `json:"downloads"`
+}
+
+// createEmailTokenHandler handles creation of new tokens
+func (ac *AppContext) createEmailTokenHandler(w http.ResponseWriter, r *http.Request) {
+	nt := context.Get(r, "body").(*newEmailToken)
+	if !govalidator.IsEmail(nt.Email) {
+		WriteError(w, &Error{ID: "bad_request", Status: 400, Title: "Invalid Email", Detail: "Invalid email provided"})
+		return
+	}
+	log.Infof("Generating token for : %s with %d downloads", nt.Email, nt.Downloads)
+	token := domain.Token{Name: util.SecureRandomString(10, true), Downloads: nt.Downloads}
+	err := ac.r.SetToken(&token)
+	if err != nil {
+		log.WithError(err).Warnf("Unable to generate token - %#v", token)
+		WriteError(w, ErrBadRequest)
+		return
+	}
+	u := &domain.User{Username: token.Name + "*-*" + nt.Email, Email: nt.Email, Token: token.Name, Type: domain.UserTypeUser, LastLogin: time.Now()}
+	err = ac.r.SetUser(u)
+	if err != nil {
+		log.WithError(err).Warnf("Error saving token user - %#v", u)
+		WriteError(w, ErrInternalServer)
+		return
+	}
+	writeJSON(w, token)
 }

@@ -75,6 +75,19 @@ func main() {
 		check(err)
 		b, _ := json.MarshalIndent(res, "", "  ")
 		fmt.Printf("Created user:\n%s\n", string(b))
+	case "email":
+		if len(args) < 2 {
+			stderr("Email syntax is: email [downloads] where downloads default is 3\n")
+		}
+		d := "3"
+		if len(args) >= 3 {
+			d = args[2]
+		}
+		downloads, err := strconv.Atoi(d)
+		check(err)
+		res, err := c.GenerateForEmail(args[1], downloads)
+		check(err)
+		fmt.Printf("Generated token %s with %d downloads\n", res.Name, res.Downloads)
 	case "upload":
 		if len(args) < 3 {
 			stderr("Upload should receive 2 parameters - name and path\n")
