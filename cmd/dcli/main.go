@@ -88,6 +88,7 @@ func main() {
 		res, err := c.GenerateForEmail(args[1], downloads)
 		check(err)
 		fmt.Printf("Generated token %s with %d downloads\n", res.Name, res.Downloads)
+		fmt.Printf("Link to download is https://download.demisto.com/download-params?token=%s&email=%s\n", res.Name, args[1])
 	case "upload":
 		if len(args) < 3 {
 			stderr("Upload should receive 2 parameters - name and path\n")
