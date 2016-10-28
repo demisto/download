@@ -73,7 +73,10 @@ func (ac *AppContext) doDownload(u *domain.User, w http.ResponseWriter, r *http.
 	downloadName := "free"
 	if r.FormValue("ova") != "" {
 		downloadName = "ova"
+	} else if r.FormValue("ovf") != "" {
+		downloadName = "ovf"
 	}
+
 	d, err := ac.r.Download(downloadName)
 	absFile, err := filepath.Abs(d.Path)
 	if err != nil {
