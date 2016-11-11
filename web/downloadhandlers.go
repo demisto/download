@@ -75,6 +75,8 @@ func (ac *AppContext) doDownload(u *domain.User, w http.ResponseWriter, r *http.
 		downloadName = "ova"
 	} else if r.FormValue("ovf") != "" {
 		downloadName = "ovf"
+	} else if r.FormValue("downloadName") != "" {
+		downloadName = r.FormValue("downloadName")
 	}
 
 	d, err := ac.r.Download(downloadName)
