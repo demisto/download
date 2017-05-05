@@ -68,6 +68,7 @@
       email = getParam('email', url),
       token = getParam('download_code', url),
       ova = getParam('ova', url),
+      ovf = getParam('ovf', url),
       checkUrl = '/check-download',
       downloadUrl = '/download',
       params = false;
@@ -80,6 +81,9 @@
 
     if (ova) {
       downloadUrl += ((params) ? '&' : '?') + $.param({ova: 'true'});
+    }
+    if (ovf) {
+      downloadUrl += ((params) ? '&' : '?') + $.param({ovf: 'true'});
     }
 
     $('.approve').click(function() {
