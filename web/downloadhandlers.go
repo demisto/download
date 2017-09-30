@@ -80,6 +80,11 @@ func (ac *AppContext) doDownload(u *domain.User, w http.ResponseWriter, r *http.
 	}
 
 	d, err := ac.r.Download(downloadName)
+	if err != nil {
+		log.WithError(err).Errorf("Unable to load download %s", downloadName)
+		WriteError(w, ErrInternalServer)
+		return
+	}
 	absFile, err := filepath.Abs(d.Path)
 	if err != nil {
 		log.WithError(err).Errorf("Something wrong with the file path - %#v", d)
