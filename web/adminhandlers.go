@@ -15,3 +15,13 @@ func (ac *AppContext) downloadLogHandler(w http.ResponseWriter, r *http.Request)
 	}
 	writeJSON(w, l)
 }
+
+// listDownloadsHandler returns the list of available downloads and versions
+func (ac *AppContext) listDownloadsHandler(w http.ResponseWriter, r *http.Request) {
+	d, err := ac.r.Downloads()
+	if err != nil {
+		log.WithError(err).Warn("Unable to retrieve downloads")
+		panic(err)
+	}
+	writeJSON(w, d)
+}

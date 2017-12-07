@@ -140,6 +140,11 @@ func (c *Client) DownloadLog() (l []domain.DownloadLog, err error) {
 	return
 }
 
+func (c *Client) ListDownloads() (d []domain.Download, err error) {
+	err = c.req("GET", "list-downloads", "", nil, &d)
+	return
+}
+
 type userDetails struct {
 	Username string          `json:"username"`
 	Password string          `json:"password"`

@@ -119,5 +119,11 @@ func main() {
 		check(err)
 		b, _ := json.MarshalIndent(l, "", "  ")
 		fmt.Printf("%s\n", string(b))
+	case "downloads":
+		d, err := c.ListDownloads()
+		check(err)
+		for _, dn := range d {
+			fmt.Printf("%20s%100s\t%v\n", dn.Name, dn.Path, dn.ModifyDate)
+		}
 	}
 }

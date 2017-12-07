@@ -174,6 +174,7 @@ func (r *Router) registerApplicationHandlers() {
 	r.Get("/download-params", nil, r.staticHandlers.ThenFunc(r.appContext.downloadParamsHandler))
 	r.Post("/upload", []domain.UserType{domain.UserTypeAdmin}, r.authHandlers.Append(multipartContentTypeHandler).ThenFunc(r.appContext.uploadHandler))
 	r.Get("/log", []domain.UserType{domain.UserTypeAdmin}, r.authHandlers.ThenFunc(r.appContext.downloadLogHandler))
+	r.Get("/list-downloads", []domain.UserType{domain.UserTypeAdmin}, r.authHandlers.ThenFunc(r.appContext.listDownloadsHandler))
 }
 
 func wrapHandler(requires []domain.UserType, h http.Handler) httprouter.Handle {

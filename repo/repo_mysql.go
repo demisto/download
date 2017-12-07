@@ -266,3 +266,8 @@ func (r *Repo) ListDownloadLog() (l []domain.DownloadLog, err error) {
 	err = r.db.Select(&l, "SELECT * FROM download_log")
 	return
 }
+
+func (r *Repo) Downloads() (d []domain.Download, err error) {
+	err = r.db.Select(&d, "SELECT * FROM downloads")
+	return
+}
