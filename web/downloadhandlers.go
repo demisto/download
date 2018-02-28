@@ -1,6 +1,8 @@
 package web
 
 import (
+	"crypto/sha256"
+	"encoding/base64"
 	"io"
 	"net/http"
 	"os"
@@ -164,13 +166,15 @@ func (ac *AppContext) uploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer out.Close()
-	_, err = io.Copy(out, file)
+	h := sha256.New()
+	tee := io.MultiWriter(h, out)
+	_, err = io.Copy(tee, file)
 	if err != nil {
 		log.WithError(err).Error("Failed copying upload file")
 		WriteError(w, ErrInternalServer)
 		return
 	}
-	err = ac.r.SetDownload(&domain.Download{Name: downloadName, Path: finalPath})
+	err = ac.r.SetDownload(&domain.Download{Name: downloadName, Path: finalPath, SHA256: base64.StdEncoding.EncodeToString(h.Sum(nil))})
 	if err != nil {
 		log.WithError(err).Error("Error saving download to DB")
 		WriteError(w, ErrInternalServer)

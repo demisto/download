@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS questions (
 CREATE TABLE IF NOT EXISTS downloads (
 	name VARCHAR(30) NOT NULL,
 	path VARCHAR(1024) NOT NULL,
+	sha256 VARCHAR(128),
 	modify_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	CONSTRAINT download_pk PRIMARY KEY (name)
 );
@@ -251,8 +252,8 @@ func (r *Repo) SetDownload(d *domain.Download) error {
 	if d.ModifyDate.IsZero() {
 		d.ModifyDate = time.Now()
 	}
-	_, err := r.db.Exec(`INSERT INTO downloads (name, path, modify_date) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE path = ?, modify_date = ?`,
-		d.Name, d.Path, d.ModifyDate, d.Path, d.ModifyDate)
+	_, err := r.db.Exec(`INSERT INTO downloads (name, path, sha256, modify_date) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE path = ?, sha256 = ?, modify_date = ?`,
+		d.Name, d.Path, d.SHA256, d.ModifyDate, d.Path, d.SHA256, d.ModifyDate)
 	return err
 }
 

@@ -5,6 +5,7 @@ import "time"
 type Download struct {
 	Name       string    `json:"name"`
 	Path       string    `json:"path"`
+	SHA256     string    `json:"sha256"`
 	ModifyDate time.Time `json:"modifyDate" db:"modify_date"`
 }
 
