@@ -5,7 +5,6 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/demisto/download/domain"
-	"github.com/demisto/download/util"
 	"github.com/gorilla/context"
 	"github.com/asaskevich/govalidator"
 	"time"
@@ -35,14 +34,14 @@ func (ac *AppContext) createTokensHandler(w http.ResponseWriter, r *http.Request
 	}
 	tokens := make([]domain.Token, 0, nt.Count)
 	for i := 0; i < nt.Count; i++ {
-		token := domain.Token{Name: util.SecureRandomString(10, true), Downloads: nt.Downloads}
-		err := ac.r.SetToken(&token)
+		token := domain.NewToken(nt.Downloads)
+		err := ac.r.SetToken(token)
 		if err != nil {
 			log.WithError(err).Warnf("Unable to generate token - %#v", token)
 			WriteError(w, ErrBadRequest)
 			return
 		}
-		tokens = append(tokens, token)
+		tokens = append(tokens, *token)
 	}
 	writeJSON(w, tokens)
 }
@@ -73,8 +72,8 @@ func (ac *AppContext) createEmailTokenHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 	log.Infof("Generating token for : %s with %d downloads", nt.Email, nt.Downloads)
-	token := domain.Token{Name: util.SecureRandomString(10, true), Downloads: nt.Downloads}
-	err := ac.r.SetToken(&token)
+	token := domain.NewToken(nt.Downloads)
+	err := ac.r.SetToken(token)
 	if err != nil {
 		log.WithError(err).Warnf("Unable to generate token - %#v", token)
 		WriteError(w, ErrBadRequest)
