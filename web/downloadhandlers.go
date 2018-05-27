@@ -151,6 +151,10 @@ func (ac *AppContext) uploadHandler(w http.ResponseWriter, r *http.Request) {
 	if len(fileName) > 0 {
 		filename = fileName // override with the provided file name
 	}
+	gitHash := r.FormValue("gitHash")
+	if gitHash == "" {
+		gitHash = "N/A"
+	}
 	// Just to be on the safe side
 	finalFileName := filepath.Base(filename)
 	if finalFileName == "." || finalFileName == "/" {
@@ -174,7 +178,7 @@ func (ac *AppContext) uploadHandler(w http.ResponseWriter, r *http.Request) {
 		WriteError(w, ErrInternalServer)
 		return
 	}
-	err = ac.r.SetDownload(&domain.Download{Name: downloadName, Path: finalPath, SHA256: base64.StdEncoding.EncodeToString(h.Sum(nil))})
+	err = ac.r.SetDownload(&domain.Download{Name: downloadName, Path: finalPath, SHA256: base64.StdEncoding.EncodeToString(h.Sum(nil)), GitHash: gitHash})
 	if err != nil {
 		log.WithError(err).Error("Error saving download to DB")
 		WriteError(w, ErrInternalServer)

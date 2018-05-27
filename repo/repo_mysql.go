@@ -252,8 +252,8 @@ func (r *Repo) SetDownload(d *domain.Download) error {
 	if d.ModifyDate.IsZero() {
 		d.ModifyDate = time.Now()
 	}
-	_, err := r.db.Exec(`INSERT INTO downloads (name, path, sha256, modify_date) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE path = ?, sha256 = ?, modify_date = ?`,
-		d.Name, d.Path, d.SHA256, d.ModifyDate, d.Path, d.SHA256, d.ModifyDate)
+	_, err := r.db.Exec(`INSERT INTO downloads (name, path, sha256, git_hash, modify_date) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE path = ?, sha256 = ?, git_hash = ?, modify_date = ?`,
+		d.Name, d.Path, d.SHA256, d.GitHash, d.ModifyDate, d.Path, d.SHA256, d.GitHash, d.ModifyDate)
 	return err
 }
 
