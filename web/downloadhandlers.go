@@ -107,7 +107,7 @@ func (ac *AppContext) doDownload(u *domain.User, w http.ResponseWriter, r *http.
 		}
 	}
 	// Just log the download
-	err = ac.r.LogDownload(u, d)
+	err = ac.r.LogDownload(u, d, r.RemoteAddr)
 	if err != nil {
 		log.WithError(err).Errorf("Could not log the download in the database - %#v [%v]", u, d)
 	}

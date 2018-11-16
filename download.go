@@ -7,6 +7,8 @@ import (
 	"syscall"
 	"time"
 
+	"gopkg.in/natefinch/lumberjack.v2"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/demisto/download/conf"
 	"github.com/demisto/download/repo"
@@ -17,6 +19,7 @@ var (
 	confFile = flag.String("conf", "", "Path to configuration file in JSON format")
 	logLevel = flag.String("loglevel", "info", "Specify the log level for output (debug/info/warn/error/fatal/panic) - default is info")
 	logFile  = flag.String("logfile", "", "The log file location")
+	logoutput   *lumberjack.Logger
 )
 
 type closer interface {
@@ -78,15 +81,14 @@ func main() {
 		logrus.Fatal(err)
 	}
 	logrus.SetLevel(level)
-	logf := os.Stderr
 	if *logFile != "" {
-		logf, err = os.OpenFile(*logFile, os.O_CREATE|os.O_APPEND, 0640)
-		if err != nil {
-			logrus.Fatal(err)
-		}
-		defer logf.Close()
+		logoutput = &lumberjack.Logger{}
+		logrus.SetOutput(logoutput)
+		logoutput.Filename = *logFile
+		logoutput.MaxSize = 10
+		logoutput.MaxBackups = 3
+		logoutput.MaxAge = 0
 	}
-	logrus.SetOutput(logf)
 	conf.LogWriter = logrus.StandardLogger().Writer()
 	defer conf.LogWriter.Close()
 

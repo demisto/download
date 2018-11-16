@@ -51,6 +51,7 @@ CREATE TABLE IF NOT EXISTS download_log (
 	username VARCHAR(128) NOT NULL,
 	name VARCHAR(30) NOT NULL,
 	path VARCHAR(1024) NOT NULL,
+	ip VARCHAR(30),
 	modify_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 )`
 
@@ -257,9 +258,9 @@ func (r *Repo) SetDownload(d *domain.Download) error {
 	return err
 }
 
-func (r *Repo) LogDownload(u *domain.User, d *domain.Download) error {
-	_, err := r.db.Exec(`INSERT INTO download_log (username, name, path, modify_date) VALUES (?, ?, ?, ?)`,
-		u.Username, d.Name, d.Path, time.Now())
+func (r *Repo) LogDownload(u *domain.User, d *domain.Download, ip string) error {
+	_, err := r.db.Exec(`INSERT INTO download_log (username, name, path, ip, modify_date) VALUES (?, ?, ?, ?, ?)`,
+		u.Username, d.Name, d.Path, ip, time.Now())
 	return err
 }
 

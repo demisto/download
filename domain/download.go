@@ -14,5 +14,6 @@ type DownloadLog struct {
 	Username   string    `json:"username"`
 	Name       string    `json:"name"`
 	Path       string    `json:"path"`
+	IP         string    `json:"ip"`
 	ModifyDate time.Time `json:"modifyDate" db:"modify_date"`
 }
