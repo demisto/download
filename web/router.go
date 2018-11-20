@@ -138,13 +138,10 @@ func (r *Router) registerStaticHandlers() {
 	r.NotFound = r.staticHandlers.ThenFunc(notFoundHandler)
 
 	// Static
-	r.Get("/", nil, r.staticHandlers.ThenFunc(pageHandler("index.html")))
-	r.Get("/no-puzzle", nil, r.staticHandlers.ThenFunc(pageHandler("index-no-puzzle.html")))
+	r.Get("/", nil, r.staticHandlers.ThenFunc(pageHandler("index-no-puzzle.html")))
 	r.Get("/favicon.ico", nil, r.staticHandlers.ThenFunc(pageHandler("favicon.ico")))
 	r.Get("/style.css", nil, r.staticHandlers.ThenFunc(pageHandler("style.css")))
 	r.Get("/404", nil, r.staticHandlers.ThenFunc(pageHandler("404.html")))
-	r.Get("/demisto-free-edition", nil, r.staticHandlers.ThenFunc(pageHandler("download.html")))
-	r.Get("/free-edition-install-guide", nil, r.staticHandlers.ThenFunc(pageHandler("Demisto Getting Started Guide Standalone.pdf")))
 	r.ServeGzipFiles("/assets/*filepath", http.Dir(public+"assets"))
 }
 
@@ -155,13 +152,6 @@ func (r *Router) registerApplicationHandlers() {
 	r.Post("/logout", nil, r.authHandlers.ThenFunc(r.appContext.logoutHandler))
 	r.Get("/user", nil, r.authHandlers.ThenFunc(r.appContext.userCurrHandler))
 	r.Post("/user", []domain.UserType{domain.UserTypeAdmin}, r.authHandlers.Append(jsonContentTypeHandler, bodyHandler(userDetails{})).ThenFunc(r.appContext.handleUserUpdate))
-	// Quiz
-	r.Get("/quiz", nil, r.commonHandlers.ThenFunc(r.appContext.quizHandler))
-	r.Get("/secret-url-for-you-to-find", nil, r.commonHandlers.ThenFunc(r.appContext.secretURLForAnswersHandler))
-	r.Get("/quizall", []domain.UserType{domain.UserTypeAdmin}, r.commonHandlers.ThenFunc(r.appContext.quizAllHandler))
-	r.Post("/quiz", []domain.UserType{domain.UserTypeAdmin}, r.authHandlers.Append(jsonContentTypeHandler, bodyHandler(domain.Quiz{})).ThenFunc(r.appContext.updateQuizHandler))
-	r.Post("/check", nil, r.commonHandlers.Append(jsonContentTypeHandler, bodyHandler(quizResponse{})).ThenFunc(r.appContext.checkQuiz))
-	r.Post("/check-cheat", nil, r.commonHandlers.Append(jsonContentTypeHandler, bodyHandler(quizResponse{})).ThenFunc(r.appContext.checkCheatQuiz))
 	// Token
 	r.Get("/token", []domain.UserType{domain.UserTypeAdmin}, r.authHandlers.ThenFunc(r.appContext.tokenHandler))
 	r.Post("/tokens/generate", []domain.UserType{domain.UserTypeAdmin}, r.authHandlers.Append(jsonContentTypeHandler, bodyHandler(newTokens{})).ThenFunc(r.appContext.createTokensHandler))

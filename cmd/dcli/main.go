@@ -109,11 +109,6 @@ func main() {
 		for _, t := range tokens {
 			fmt.Printf("%s\t\t%d\n", t.Name, t.Downloads)
 		}
-	case "q":
-		questions, err := c.Questions()
-		check(err)
-		b, _ := json.MarshalIndent(questions, "", "  ")
-		fmt.Printf("%s\n", string(b))
 	case "log":
 		l, err := c.DownloadLog()
 		check(err)

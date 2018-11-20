@@ -33,13 +33,6 @@ CREATE TABLE IF NOT EXISTS tokens (
 	downloads INT NOT NULL,
 	CONSTRAINT tokens_pk PRIMARY KEY (name)
 );
-CREATE TABLE IF NOT EXISTS questions (
-	name VARCHAR(30) NOT NULL,
-	question VARCHAR(512) NOT NULL,
-	answers VARCHAR(1024) NOT NULL,
-	correct VARCHAR(30) NOT NULL,
-	CONSTRAINT questions_pk PRIMARY KEY (name)
-);
 CREATE TABLE IF NOT EXISTS downloads (
 	name VARCHAR(30) NOT NULL,
 	path VARCHAR(1024) NOT NULL,
@@ -175,41 +168,6 @@ last_login = ?,
 token = ?`,
 		u.Username, u.Hash, u.Email, u.Name, u.Type, u.ModifyDate, u.LastLogin, u.Token,
 		u.Hash, u.Email, u.Name, u.Type, u.ModifyDate, u.LastLogin, u.Token)
-	return err
-}
-
-func (r *Repo) Questions() (q []domain.Quiz, err error) {
-	type question struct {
-		Name     string
-		Question string
-		Answers  string
-		Correct  string
-	}
-	var questions []question
-	err = r.db.Select(&questions, "SELECT * FROM questions")
-	if err != nil {
-		return
-	}
-	for i := range questions {
-		q = append(q, domain.Quiz{
-			Name:     questions[i].Name,
-			Question: questions[i].Question,
-			Answers:  domain.AnswersFromString(questions[i].Answers),
-			Correct:  domain.CorrectFromString(questions[i].Correct)})
-	}
-	return
-}
-
-func (r *Repo) SetQuestion(q *domain.Quiz) error {
-	logrus.Infof("Saving quiz - %s", q.Name)
-	answers := domain.AnswersToString(q.Answers)
-	correct := domain.CorrectToString(q.Correct)
-	_, err := r.db.Exec(`INSERT INTO questions (name, question, answers, correct) VALUES (?, ?, ?, ?)
-ON DUPLICATE KEY UPDATE
-question = ?,
-answers = ?,
-correct = ?`,
-		q.Name, q.Question, answers, correct, q.Question, answers, correct)
 	return err
 }
 

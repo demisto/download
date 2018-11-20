@@ -23,133 +23,15 @@
     <link rel="stylesheet" type="text/css" href="/style.css">
 </head>
 <body>
-<div class="ui middle aligned center aligned grid main-form content">
+<div class="ui middle aligned center aligned grid">
     <div class="column">
         <h2 class="ui demisto-green image header">
             <img src="/assets/logo.png" class="image"/>
-            <div class="content">Please provide the token and email</div>
+            <div class="content">To receive a download link, go to Demisto <a href="https://www.demisto.com">home</a> and fill the form for free community edition.</div>
         </h2>
-        <form id="quiz" class="ui large form">
-            <div class="quiz">
-                <div class="field">
-                    <div class="ui left icon input">
-                        <i class="user icon"></i>
-                        <input type="text" id="email" name="email" placeholder="E-mail address">
-                    </div>
-                </div>
-                <div class="field">
-                    <div class="ui left icon input">
-                        <i class="lock icon"></i>
-                        <input type="text" id="token" name="token" placeholder="Code to unlock download">
-                    </div>
-                </div>
-                <div class="ui fluid large teal submit button" id="submit">Submit</div>
-            </div>
-            <div class="ui error message"></div>
-        </form>
-    </div>
-</div>
-<div id="errorModal" class="ui small modal">
-    <div class="header">Error</div>
-    <div class="content">
-        <p>Some error occurred</p>
-    </div>
-    <div class="actions">
-        <div class="ui approve button">OK</div>
     </div>
 </div>
 <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/semantic-ui/2.2.2/semantic.min.js" crossorigin="anonymous"></script>
-<script type="text/javascript">
-  function handleError(status) {
-    $('#errorModal .header').text(status.title);
-    $('#errorModal .content p').text(status.detail);
-    $('#errorModal').modal('show');
-  }
-
-  function getParam(name, url) {
-    if (!url) url = window.location.href;
-    name = name.replace(/[\[\]]/g, '\\$&');
-    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
-        results = regex.exec(url);
-    if (!results) return null;
-    if (!results[2]) return '';
-    return decodeURIComponent(results[2].replace(/\+/g, ' '));
-  }
-
-  function populateToken() {
-    var url = window.location.href,
-      email = getParam('email', url),
-      token = getParam('download_code', url);
-    if (token) {
-      document.getElementById('token').value = token;
-    }
-    if (email) {
-      document.getElementById('email').value = email;
-    }
-  }
-
-  $(document).ready(function () {
-    populateToken();
-    $('.ui.form').form({
-      fields: {
-        email: {
-          identifier  : 'email',
-          rules: [
-            {
-              type   : 'empty',
-              prompt : 'Please enter your e-mail'
-            },
-            {
-              type   : 'email',
-              prompt : 'Please enter a valid e-mail'
-            }
-          ]
-        },
-        token: {
-          identifier  : 'token',
-          rules: [
-            {
-              type   : 'empty',
-              prompt : 'Please enter the code to unlock the download'
-            }
-          ]
-        }
-      }
-    });
-    $('#quiz').submit(function(e) {
-      e.preventDefault();
-      if (!$(this).form('is valid')) {
-        return;
-      }
-      var xsrfToken = decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent('XSRF-TOKEN').replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
-      var token = document.getElementById('token').value;
-      var email = document.getElementById('email').value;
-      var quizResponse = {token: token, email: email};
-      $.ajax({
-        url: '/check-cheat',
-        headers: {
-          'X-XSRF-TOKEN': xsrfToken,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        method: 'POST',
-        dataType: 'json',
-        data: JSON.stringify(quizResponse),
-        success: function (data) {
-          window.location.href = 'http://go.demisto.com/community-edition-download?' + $.param({download_code: token, email: email});
-        },
-        statusCode: {
-          400: function(xhr) {
-            handleError(xhr.responseJSON);
-          },
-          500: function(xhr) {
-            handleError(xhr.responseJSON);
-          }
-        }
-      });
-    });
-  });
-</script>
 </body>
 </html>

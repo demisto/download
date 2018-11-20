@@ -224,8 +224,3 @@ func (c *Client) GenerateForEmail(email string, downloads int) (token *domain.To
 	err = c.req("POST", "tokens/email", "", bytes.NewBuffer(b), &token)
 	return
 }
-
-func (c *Client) Questions() (questions []domain.Quiz, err error) {
-	err = c.req("GET", "quizall", "", nil, &questions)
-	return
-}

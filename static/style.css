@@ -1,13 +1,9 @@
 body {
-  background-color: #618081;
+  background-color: #161616;
 }
 
 body > .grid {
   height: 100%;
-}
-
-.main-form {
-  margin-top: 160px !important;
 }
 
 .image {
@@ -15,37 +11,14 @@ body > .grid {
 }
 
 .column {
-  max-width: 450px;
+  max-width: 600px;
 }
 
 .demisto-green {
-  color: #dcdcdc !important;
-}
-
-.submit {
-  background-color: #f2ae31 !important;
-  color: #181818 !important;
-}
-
-.submit:hover {
-  background-color: #ffb622 !important;
+  color: #FFFFFF !important;
 }
 
 .header .image {
-  background-color: #618081 !important;
+  background-color: #161616 !important;
   width: 100% !important;
-}
-
-.quiz {
-  background-color: #fcfcfc !important;
-  padding: 10px;
-  border-radius: 4px;
-}
-
-.answer-content {
-  text-align: left !important;
-}
-
-.secret {
-  color: #618081;
 }

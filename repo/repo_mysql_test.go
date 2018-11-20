@@ -50,22 +50,6 @@ func TestUser(t *testing.T) {
 	r.Close()
 }
 
-func TestQuestion(t *testing.T) {
-	r := getTestDB(t)
-	q := &domain.Quiz{Name: "q", Question: "question", Answers: []string{"a1", "a2", "a3", "a4"}, Correct: []int{2, 3}}
-	err := r.SetQuestion(q)
-	if err != nil {
-		t.Fatalf("Unable to create question - %v", err)
-	}
-	questions, err := r.Questions()
-	if err != nil {
-		t.Fatalf("Unable to retrieve questions - %v", err)
-	}
-	if len(questions) != 1 {
-		t.Errorf("Expecting a single question - %v", questions)
-	}
-}
-
 func TestToken(t *testing.T) {
 	r := getTestDB(t)
 	token := &domain.Token{Name: "t", Downloads: 10}
