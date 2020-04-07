@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS downloads (
 	name VARCHAR(30) NOT NULL,
 	path VARCHAR(1024) NOT NULL,
 	sha256 VARCHAR(128),
+	username VARCHAR(128) NOT NULL DEFAULT '',
 	modify_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	CONSTRAINT download_pk PRIMARY KEY (name)
 );
@@ -211,8 +212,8 @@ func (r *Repo) SetDownload(d *domain.Download) error {
 	if d.ModifyDate.IsZero() {
 		d.ModifyDate = time.Now()
 	}
-	_, err := r.db.Exec(`INSERT INTO downloads (name, path, sha256, git_hash, modify_date) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE path = ?, sha256 = ?, git_hash = ?, modify_date = ?`,
-		d.Name, d.Path, d.SHA256, d.GitHash, d.ModifyDate, d.Path, d.SHA256, d.GitHash, d.ModifyDate)
+	_, err := r.db.Exec(`INSERT INTO downloads (name, path, sha256, git_hash, username, modify_date) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE path = ?, sha256 = ?, git_hash = ?, username = ?, modify_date = ?`,
+		d.Name, d.Path, d.SHA256, d.GitHash, d.Username, d.ModifyDate, d.Path, d.SHA256, d.GitHash, d.Username, d.ModifyDate)
 	return err
 }
 

@@ -87,6 +87,11 @@ func (ac *AppContext) doDownload(u *domain.User, w http.ResponseWriter, r *http.
 		WriteError(w, ErrInternalServer)
 		return
 	}
+	if d.Username != "" && u.Username != d.Username {
+		log.Errorf("download [%s] is restricted to user [%s] but user [%s] tried to download", downloadName, d.Username, u.Username)
+		WriteError(w, ErrBadRequest)
+		return
+	}
 	absFile, err := filepath.Abs(d.Path)
 	if err != nil {
 		log.WithError(err).Errorf("Something wrong with the file path - %#v", d)
@@ -155,6 +160,7 @@ func (ac *AppContext) uploadHandler(w http.ResponseWriter, r *http.Request) {
 	if gitHash == "" {
 		gitHash = "N/A"
 	}
+	username := r.FormValue("username")
 	// Just to be on the safe side
 	finalFileName := filepath.Base(filename)
 	if finalFileName == "." || finalFileName == "/" {
@@ -178,7 +184,13 @@ func (ac *AppContext) uploadHandler(w http.ResponseWriter, r *http.Request) {
 		WriteError(w, ErrInternalServer)
 		return
 	}
-	err = ac.r.SetDownload(&domain.Download{Name: downloadName, Path: finalPath, SHA256: base64.StdEncoding.EncodeToString(h.Sum(nil)), GitHash: gitHash})
+	err = ac.r.SetDownload(&domain.Download{
+		Name: downloadName,
+		Path: finalPath,
+		SHA256: base64.StdEncoding.EncodeToString(h.Sum(nil)),
+		GitHash: gitHash,
+		Username: username,
+	})
 	if err != nil {
 		log.WithError(err).Error("Error saving download to DB")
 		WriteError(w, ErrInternalServer)
